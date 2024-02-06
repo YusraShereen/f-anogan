@@ -55,7 +55,7 @@ def train_encoder_izif(opt, generator, discriminator, encoder,
             loss_features = criterion(fake_features, real_features)
             e_loss = loss_imgs + kappa * loss_features
 
-            encoder_loss.append(e_loss)
+            encoder_loss.append(e_loss.item())
 
             e_loss.backward()
             optimizer_E.step()
