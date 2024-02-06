@@ -2,6 +2,8 @@ import os
 import torch
 import torch.autograd as autograd
 from torchvision.utils import save_image
+import matplotlib.pyplot as plt
+import numpy
 
 
 def compute_gradient_penalty(D, real_samples, fake_samples, device):
@@ -37,6 +39,9 @@ def train_wgangp(opt, generator, discriminator,
     padding_epoch = len(str(opt.n_epochs))
     padding_i = len(str(len(dataloader)))
 
+    gen_loss = []
+    dis_loss = []
+
     batches_done = 0
     for epoch in range(opt.n_epochs):
         for i, (imgs, _)in enumerate(dataloader):
@@ -69,6 +74,8 @@ def train_wgangp(opt, generator, discriminator,
             d_loss = (-torch.mean(real_validity) + torch.mean(fake_validity)
                       + lambda_gp * gradient_penalty)
 
+            dis_loss.append(d_loss.item())
+
             d_loss.backward()
             optimizer_D.step()
 
@@ -87,6 +94,8 @@ def train_wgangp(opt, generator, discriminator,
                 # Train on fake images
                 fake_validity = discriminator(fake_imgs)
                 g_loss = -torch.mean(fake_validity)
+
+                gen_loss.append(g_loss.item())
 
                 g_loss.backward()
                 optimizer_G.step()
@@ -108,16 +117,16 @@ def train_wgangp(opt, generator, discriminator,
     
     plt.figure(figsize=(10,5))
     plt.title("Generator and Discriminator Training Loss")
-    plt.plot(g_loss.cpu().detach().numpy(),label="Generator")
-    plt.plot(d_loss.cpu().detach().numpy(),label="Discriminator")
+    plt.plot(gen_loss,label="Generator")
+    plt.plot(dis_loss,label="Discriminator")
     plt.xlabel("iterations")
     plt.ylabel("Loss")
     plt.legend()
     plt.savefig("results/gan_loss_t.png")
 
     plt.figure(figsize=(10,5))
-    plt.plot(g_loss.cpu().detach().numpy(),label="Generator")
-    plt.plot(d_loss.cpu().detach().numpy(),label="Discriminator")
+    plt.plot(gen_loss,label="Generator")
+    plt.plot(dis_loss,label="Discriminator")
     plt.xlabel("iterations")
     plt.ylabel("Loss")
     plt.legend()
