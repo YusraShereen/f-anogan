@@ -2,6 +2,8 @@ import os
 import torch
 import torch.nn as nn
 from torchvision.utils import save_image
+import matplotlib.pyplot as plt
+import numpy
 
 def train_encoder_izif(opt, generator, discriminator, encoder,
                        dataloader, device, kappa=1.0):
@@ -21,6 +23,8 @@ def train_encoder_izif(opt, generator, discriminator, encoder,
 
     padding_epoch = len(str(opt.n_epochs))
     padding_i = len(str(len(dataloader)))
+
+    encoder_loss= []
 
     batches_done = 0
     for epoch in range(opt.n_epochs):
@@ -51,6 +55,8 @@ def train_encoder_izif(opt, generator, discriminator, encoder,
             loss_features = criterion(fake_features, real_features)
             e_loss = loss_imgs + kappa * loss_features
 
+            encoder_loss.append(e_loss)
+
             e_loss.backward()
             optimizer_E.step()
 
@@ -69,3 +75,20 @@ def train_encoder_izif(opt, generator, discriminator, encoder,
 
                 batches_done += opt.n_critic
     torch.save(encoder.state_dict(), "results/encoder")
+
+    plt.figure(figsize=(10,5))
+    plt.title("Encoder izif Loss")
+    plt.plot(encoder_loss,label="Encoder izif")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("results/encoder_izif_loss_t.png")
+
+    plt.figure(figsize=(10,5))
+    plt.plot(encoder_loss,label="Encoder izif")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("results/encoder_izif_loss.png")
+
+   
