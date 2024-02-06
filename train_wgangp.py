@@ -105,3 +105,20 @@ def train_wgangp(opt, generator, discriminator,
 
     torch.save(generator.state_dict(), "results/generator")
     torch.save(discriminator.state_dict(), "results/discriminator")
+    
+    plt.figure(figsize=(10,5))
+    plt.title("Generator and Discriminator Training Loss")
+    plt.plot(g_loss.cpu().detach().numpy(),label="Generator")
+    plt.plot(d_loss.cpu().detach().numpy(),label="Discriminator")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("results/gan_loss_t.png")
+
+    plt.figure(figsize=(10,5))
+    plt.plot(g_loss.cpu().detach().numpy(),label="Generator")
+    plt.plot(d_loss.cpu().detach().numpy(),label="Discriminator")
+    plt.xlabel("iterations")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("results/gan_loss.png")
